@@ -1,0 +1,35 @@
+#! /bin/zsh
+
+function _get_config_value() {
+    local option=$1
+    local config_file=$2
+    echo $(cat $config_file | grep "^$option=" | sed "s/$option=//g" | sed "s/['\"]//g" | sed "s:~:$HOME:g")
+}
+
+function _get_default_value() {
+    local option=$1
+
+    case "$option" in
+        OUTPUT_DIR)
+            echo "$HOME/.brewery"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
+function _get_config() {
+    local option=$1
+    local config_file=$([[ -e $HOME/.brewery.conf ]] \
+        && echo "$HOME/.brewery.conf" \
+        || echo "")
+
+    if [[ $config_file != "" ]]; then
+        _get_config_value $option $config_file
+    else
+        _get_default_value $option
+    fi
+}
+
+_get_config OUTPUT_DIR
